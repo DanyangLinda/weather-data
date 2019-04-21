@@ -45,7 +45,7 @@ object weatherData {
   def generateLocalDateTime(longitude: Double, milliSeconds: Long = Duration(365*10, DAYS).toMillis): LocalDateTime = {
     val instant = Instant.ofEpochMilli(System.currentTimeMillis() - (milliSeconds*Random.nextDouble()).toLong)
 
-    val offSet = Math.round(Math.abs(longitude)/15.0).toInt.toString
+    val offSet = Math.round(Math.abs(longitude)/15.0).toInt
 
     val direction = if(longitude > 0) "+" else "-"
 
@@ -61,7 +61,7 @@ object weatherData {
 
     val month = localDateTime.getMonthValue
     val direction = if(latitude >= 0) 1 else -1
-    val seasonTemp = direction * Math.sin(30 * month - 120) * 10
+    val seasonTemp = direction * Math.sin(30 * month - 120) * 15
 
     val hourOfDay = localDateTime.getHour
     val dayNightTemp = Math.cos(15 * hourOfDay - 180) * 5
@@ -85,11 +85,11 @@ object weatherData {
 
   def generateHumidity(condition: String): Int = {
     if(condition.equals(snow)) {
-      Math.round(Random.nextDouble()*40).toInt
+      Math.round(Random.nextDouble() * 40).toInt
     } else if(condition.equals(rain)) {
-      Math.round(30+Random.nextDouble()*70).toInt
+      Math.round(30 + Random.nextDouble() * 70).toInt
     } else {
-      Math.round(Random.nextDouble()*100).toInt
+      Math.round(Random.nextDouble() * 100).toInt
     }
   }
 }

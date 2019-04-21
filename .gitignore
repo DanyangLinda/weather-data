@@ -4,3 +4,4 @@ project/
 target/
 .idea
 input/earthImage.csv
+data-20*
