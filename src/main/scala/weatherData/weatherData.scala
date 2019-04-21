@@ -1,4 +1,4 @@
-package weather
+package weatherData
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.time.format.DateTimeFormatter
