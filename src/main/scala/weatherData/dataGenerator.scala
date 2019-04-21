@@ -1,11 +1,9 @@
 package weatherData
 
-import java.io.{BufferedWriter, FileWriter}
-import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 import org.apache.spark.SparkConf
-import javax.imageio.ImageIO
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.{Row, SparkSession}
 
@@ -21,7 +19,6 @@ object dataGenerator {
   @transient lazy val config: SparkConf = new SparkConf().setMaster("local").setAppName("CBA Weather Data Challenge")
   @transient lazy val spark: SparkSession = SparkSession.builder().config(config).getOrCreate()
 
-  val earthImageCsvFile: String = "input/earthImage.csv"
   val worldCityFile: String = "input/worldcities.csv"
 
   val imageCentralX: Int = 21600/2
@@ -39,17 +36,11 @@ object dataGenerator {
 
   def main(args: Array[String]): Unit = {
     //check if earth image csv file exists
-    if(!File(earthImageCsvFile).exists) {
-      if(!args.isEmpty) {
-        convertEarthImageToCsv(args(0))
-      } else {
-        println("Earth image csv file doesn't exist. " +
-          "Please specify the path of the original earth image to generate csv file.")
-        System.exit(1)
-      }
+    if(!File(imageData.earthImageCsv).exists) {
+      imageData.convertEarthImageToCsv()
     }
 
-    val dataFolder = "data-"+LocalDateTime.now().format(DateTimeFormatter.ofPattern("YYYYMMdd_HHmmss"))
+    val outputFolder = "data-"+LocalDateTime.now().format(DateTimeFormatter.ofPattern("YYYYMMdd_HHmmss"))
 
     val worldCities = spark.read.format("csv").option("header", value = true).load(worldCityFile).rdd
       .mapPartitions[(PixelCoordinate, City)](toPixelCity)
@@ -59,15 +50,14 @@ object dataGenerator {
     //Note: worldCities dataset is much smaller than earthImage dataset, so here broadcast small RDD to avoid shuffle.
     val broadcastCities: Broadcast[Map[PixelCoordinate, City]] = spark.sparkContext.broadcast(worldCities)
 
-    val geographyRdd = spark.read.csv(earthImageCsvFile).rdd
+    val geographyRdd = spark.read.csv(imageData.earthImageCsv).rdd
       .mapPartitions[(Location, Position)](toGeography(_, broadcastCities))
 
     geographyRdd.map(v => weatherData.generateWeatherData(v._1, v._2))
       .coalesce(1)
-      .saveAsTextFile(dataFolder)
+      .saveAsTextFile(outputFolder)
 
     spark.stop()
-
   }
 
   def toPixelCity(partition:Iterator[Row]): Iterator[(PixelCoordinate, City)] = {
@@ -99,19 +89,4 @@ object dataGenerator {
     }
     geographyData.iterator
   }
-
-  def convertEarthImageToCsv(earthImagePath: String): Unit = {
-    val earthImage = ImageIO.read(File(earthImagePath).jfile)
-    val height = earthImage.getHeight
-    val width = earthImage.getWidth
-    val outputFile = new BufferedWriter(new FileWriter(earthImageCsvFile))
-    for(x <- 0 until width) {
-      for(y <- 0 until height) {
-        val greyValue = earthImage.getRGB(x,y) & 0xFF
-        outputFile.write(x+","+y+","+greyValue+"\n")
-      }
-    }
-    outputFile.close()
-  }
 }
-
