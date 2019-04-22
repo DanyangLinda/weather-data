@@ -2,10 +2,10 @@
 ## Environment
 1. Scala 2.11.12
 2. Sbt 1.2.8
-3. Spark 2.3.2 (spark is embeded in the code so you don't need to install it)
+3. Spark 2.3.2 (spark is embeded lib, so you don't need to install it)
 
 ## Getting started
-1. Download the project. Take a look at the pre-generated data as exmaple "weather-data/data-example/part-00000"
+1. Download the project. Please take a look at the pre-generated data as exmaple
 ```
 git clone git clone https://github.com/DanyangLinda/weather-data.git
 ```
@@ -14,7 +14,7 @@ git clone git clone https://github.com/DanyangLinda/weather-data.git
 cd weather-data
 sbt run
 ```
-3. Spark is configured to run in local mode with 1 core and 500 MB memory. It will take about 10 mininutes to finish for your first time of running the code, as it will take a few mininutes to convert the earth image to a csv file (earthImage.csv) of 3.2 GB.
+3. Spark is configured to run in local mode with 1 core and 500 MB memory. It will take about 10 mininutes to finish for your first time to run the code, as it will take a few mininutes to convert the earth image to earthImage.csv of 3.2 GB.
   
 ## Task
 The requirement is to genrate weather data from reasonable number of positions in the following format
@@ -38,7 +38,8 @@ The earth image at [Visible Earth](https://visibleearth.nasa.gov/view.php?id=739
 3,6390,22
 3,6391,13
 ```
-Each line consists of three numbers. The first and second numbers are the x and y coordinate of a pixel. The third number is the grey value of the pixel. As the resolution of the earth image is 21600 by 10800, the generated csv file contains 233,280,000 lines represents 21600*10800 pixels of the image. 
+
+Each line consists of three numbers. The first and second numbers are the x and y coordinate of a pixel. The third number is the grey value of the pixel. As the resolution of the earth image is 21600 by 10800, the generated csv file contains 233,280,000 lines representing 21600*10800 pixels of the Earth image. 
 
 However the earth image deson't have location lables. So I employ another dataset from [Simple Maps](https://simplemaps.com/data/world-cities). The dataset (weather-data/input/worldcities.csv) I used is the free version with about 13000 entries of city name, latitude and longitude as follows:
 ```
@@ -46,16 +47,33 @@ However the earth image deson't have location lables. So I employ another datase
 "Sydney","-33.9200","151.1852"
 "Beijing","39.9289","116.3883"
 ```
-Spark is used to combine the two datasets to contrct complete location and position dataset, where location, latitude and longitude comes from worldcities.csv and elevation comes from earthImage.csv. 
 
-Using [Equirectangular Projection](https://www.tandfonline.com/doi/pdf/10.1080/10095020.2015.1017913) to map longitude and latitude to x and y coordinates of the pixels, so that spark can join two datasets to construct the following geography dataset:
+Spark is used to combine the two datasets to contrct complete location and position dataset, where location, latitude and longitude comes from worldcities.csv and elevation comes from earthImage.csv (I roughly calculate elevation based on grey value of pixels with the formular `greyValue*(8848/255)` where maximum gray value is 255 and I assume the highest elevation is 8848 metres). 
+
+Using [Equirectangular Projection](https://www.tandfonline.com/doi/pdf/10.1080/10095020.2015.1017913) to map longitude and latitude to x and y coordinates of the pixels, I can use Spark can join two datasets to construct the following geography dataset:
 ```
 Location,Position(latitude, longitude, elevation)
 ```
 
-Note: In the implemenation, I don't use "join" function to combine the two datasets directly cause that will result in shuffling more than 3 GB data. As world cities dataset (about 1 MB) is much smaller than earth image dataset (about 3 GB), I decided to broadcast the samll dataset to avoid shuffle. 
+Note: 
+2. elevation = grayValue*(8848/255)
+1. In the implemenation, I don't use "join" function to combine the two datasets directly cause that will result in shuffling more than 3 GB data. As world cities dataset (about 1 MB) is much smaller than earth image dataset (about 3 GB), I decided to broadcast the samll dataset to avoid shuffle. 
 
 ### Generate weather data
+Weather data is generated based on geography data set from previouse process. Weather data consists of 5 parts: local date time, conditions (snow, sunny or rain), temperature, pressure and humidity. 
 
+#### Local date time
+Time offset can be roughly 
+
+#### Temperature
+
+
+#### Condition
+
+
+#### Pressure
+
+
+#### Humidity
 
 
