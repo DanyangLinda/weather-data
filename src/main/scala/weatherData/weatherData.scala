@@ -57,7 +57,7 @@ object weatherData {
 
   def generateTemperature(latitude: Double, elevation: Int, localDateTime: LocalDateTime): Double = {
     val baseTemp = Math.cos(2 * latitude) * 30
-    val elevationTemp = - elevation * 0.0006
+    val elevationTemp = - elevation * 0.0065
 
     val month = localDateTime.getMonthValue
     val direction = if(latitude >= 0) 1 else -1
