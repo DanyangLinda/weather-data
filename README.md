@@ -59,9 +59,9 @@ However the earth image deson't have location lables. So I employ another datase
 "Beijing","39.9289","116.3883"
 ```
 
-Spark is used to combine the two datasets to contrct complete location and position dataset, where location, latitude and longitude comes from worldcities.csv and elevation comes from earthImage.csv (I roughly calculate elevation based on grey value of pixels with the formular `greyValue*(8848/255)` where maximum gray value is 255 and I assume the highest elevation is 8848 metres). 
+Spark is used to combine the two datasets to construct location and position dataset, where location, latitude and longitude comes from worldcities.csv and elevation comes from earthImage.csv (I roughly calculate elevation based on grey value of pixels with the formular `elevation=greyValue*(8848/255)` where maximum gray value is 255 and I assume the highest elevation is 8848 metres). 
 
-Using [Equirectangular Projection](https://www.tandfonline.com/doi/pdf/10.1080/10095020.2015.1017913) to map longitude and latitude to x and y coordinates of the pixels, I can use Spark can join two datasets to construct the following geography dataset:
+Using [Equirectangular Projection](https://www.tandfonline.com/doi/pdf/10.1080/10095020.2015.1017913) to map longitude and latitude to x and y coordinates of the pixels, Spark joins two datasets to construct the following geography dataset:
 ```
 Location,Position(latitude, longitude, elevation)
 ```
@@ -72,17 +72,17 @@ Location,Position(latitude, longitude, elevation)
 Weather data is generated based on geography dataset from previouse process. Weather data consists of 5 parts: local date time, conditions (snow, sunny or rain), temperature, pressure and humidity. 
 
 #### Local date time
-A time instant is genrated by randomly picking an epoch milliseconds between system current time and 10 years ago. Time offset is roughly calculated by longitude with the formula `longtitude/15`. Getting the local date time by applying the calculated time offset to the instant.
+A time instant is genrated by randomly picking an epoch milliseconds between system current time and 10 years ago from current time. Time offset is roughly calculated by longitude with the formula `longtitude/15`. I apply the calculated time offset to the instant to get local date time.
 
 #### Temperature
-Temperature is impaced by the following factors:
+Temperature is impacted by the following factors:
 1. Latitude. The closer a position is to Equator, the greater is the temperature. I use a cosine wave to do the calculation and assume the variation is between 30 and -30 Centigrade. The formula is `30*cosin(2*latitude)`.
 2. Elevation. Temperatures in the troposphere drop an average of 6.5 Centigrade per kilometer of altitude (referencing [sciencing.com](https://sciencing.com/tutorial-calculate-altitude-temperature-8788701.html)). The formula is `-6.5*(elevation/1000)`
 3. Month. The closer a month to hot summer (July in the North Hemisphere or Jan in the South Hemisphere), the greater is the temperature. I use a sine wave to do the calculation and assume the variation is between + 15 and -15 Centigrade. The formula is `direction * sine(month*360/24 - 90) * 15`, where "deirction" is -1 or 1 representing the North Hemisphere or the South Hemisphere and "month" is an integer between 1 and 12.
 4. Time. I assume normally, the hightest temperature is at noon(12:00) and lowest temperature is at midnight(24:00). I use a sine wave to mimic the variation between +5 and -5. The formular is `sine(hourOfDay*360/24) * 5`
 
 #### Condition
-I only need to consider three conditions: Sunny, Rain and Snow. To make it simple, I assume that if temperature is below zero, the condition is randomly chosen between Sunny and Snow; if temperature is above zero, the condition is randomly chosen between Rain and Sunny. 
+I only need to consider three conditions: Sunny, Rain and Snow. To make it simple, if temperature is below zero, the condition is randomly chosen between Sunny and Snow; if temperature is above zero, the condition is randomly chosen between Rain and Sunny. 
 
 #### Pressure
 Pressure is impacted by elevation. I adopt [Barometric formula](https://en.wikipedia.org/wiki/Barometric_formula) to calculate pressure.
