@@ -70,7 +70,7 @@ object weatherData {
   }
 
   def generateCondition(temperature: Double): String = {
-    val index = Random.nextInt(1)
+    val index = Random.nextInt(2)
 
     if(temperature < 0 ) {
       conditionsBelowZero(index)
