@@ -81,10 +81,15 @@ object dataGenerator {
     for(row <- partition) {
       Try {
         val coordinate = (row.getString(0).toInt, row.getString(1).toInt)
-        val v = broadcastCities.value.get(coordinate)
-        if (v.isDefined) {
-          val l = v.get
-          geographyData += ((l._1, Position(l._2, l._3, Math.round(row.getString(2).toInt*altScale).toInt)))
+
+        val optionCity = broadcastCities.value.get(coordinate)
+        if (optionCity.isDefined) {
+          val city = optionCity.get
+          val elevation =  Math.round(row.getString(2).toInt * altScale).toInt
+          val location = city._1
+          val latitude = city._2
+          val longitude = city._3
+          geographyData += ((location, Position(latitude, longitude, elevation)))
         }
       }
     }
