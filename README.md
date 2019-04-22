@@ -15,6 +15,17 @@ cd weather-data
 sbt run
 ```
 3. Spark is configured to run in local mode with 1 core and 500 MB memory. It will take about 10 mininutes to finish for your first time to run the code, as it will take a few mininutes to convert the earth image to earthImage.csv of 3.2 GB.
+
+4. If you see the fowllowing worning message from Spark, please ignore it. It not an error, and it means Spark is cleaning up some temp files.  
+```
+19/04/22 13:22:45 WARN FileSystem: exception in the cleaner thread but it will continue to run
+java.lang.InterruptedException
+        at java.lang.Object.wait(Native Method)
+        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:144)
+        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:165)
+        at org.apache.hadoop.fs.FileSystem$Statistics$StatisticsDataReferenceCleaner.run(FileSystem.java:2989)
+        at java.lang.Thread.run(Thread.java:748)
+```
   
 ## Task
 The requirement is to genrate weather data from reasonable number of positions in the following format
