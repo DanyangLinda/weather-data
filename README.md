@@ -15,7 +15,7 @@ git clone git clone https://github.com/DanyangLinda/weather-data.git
 cd weather-data
 sbt run
 ```
-3. Spark is configured to run in local mode with 1 core and 500 MB memory. It will take about 10 mininutes to finish for your first time of running the code, as it will take a few mininutes to convert the earth image to a csv file.
+3. Spark is configured to run in local mode with 1 core and 500 MB memory. It will take about 10 mininutes to finish for your first time of running the code, as it will take a few mininutes to convert the earth image to a csv file (earthImage.csv) of 3.2 GB.
 
 ## Solution design
 
