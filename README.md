@@ -7,7 +7,7 @@
 ## Getting started
 1. Download the project. Please take a look at the [pre-generated data](https://github.com/DanyangLinda/weather-data/blob/master/data-example/part-00000) as exmaple
 ```
-git clone git clone https://github.com/DanyangLinda/weather-data.git
+git clone https://github.com/DanyangLinda/weather-data.git
 ```
 2. Run the code. The output data is written in "weather-data/data-<timestamp>/part-00000".
 ```
