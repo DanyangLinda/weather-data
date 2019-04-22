@@ -55,9 +55,7 @@ Using [Equirectangular Projection](https://www.tandfonline.com/doi/pdf/10.1080/1
 Location,Position(latitude, longitude, elevation)
 ```
 
-Note: 
-2. elevation = grayValue*(8848/255)
-1. In the implemenation, I don't use "join" function to combine the two datasets directly cause that will result in shuffling more than 3 GB data. As world cities dataset (about 1 MB) is much smaller than earth image dataset (about 3 GB), I decided to broadcast the samll dataset to avoid shuffle. 
+***Note: In the implemenation, I don't use "join" function to combine the two datasets directly cause that will result in shuffling more than 3 GB data. As world cities dataset (about 1 MB) is much smaller than earth image dataset (about 3 GB), I decided to broadcast the samll dataset to avoid shuffle.***
 
 ### Generate weather data
 Weather data is generated based on geography dataset from previouse process. Weather data consists of 5 parts: local date time, conditions (snow, sunny or rain), temperature, pressure and humidity. 
