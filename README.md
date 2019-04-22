@@ -9,7 +9,7 @@
 ```
 git clone https://github.com/DanyangLinda/weather-data.git
 ```
-2. Run the code. The output data is written in "weather-data/data-\<timestamp>\/part-00000".
+2. Run the code. The output data is written in "weather-data/data-\<timestamp>\/part-00000". It will generate about weather data from about 13000 positions.
 ```
 cd weather-data
 sbt run
