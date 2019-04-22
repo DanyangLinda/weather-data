@@ -14,7 +14,7 @@ git clone https://github.com/DanyangLinda/weather-data.git
 cd weather-data
 sbt run
 ```
-3. Spark is configured to run in local mode with 1 core and 500 MB memory. It will take about 10 mininutes to finish for your first time to run the code, as it will take a few mininutes to convert the earth image to earthImage.csv of 3.2 GB.
+3. Spark is configured to run in local mode with 1 core and 500 MB memory. It will take about 10 mininutes to finish for your first time to run the code, as it will take a few mininutes to convert the [earth image](https://visibleearth.nasa.gov/view.php?id=73934) to earthImage.csv of 3.2 GB.
 
 4. If you see the fowllowing warning message from Spark, please ignore it. It's not an error. It means Spark is cleaning up some temp files.  
 ```
@@ -75,7 +75,7 @@ Weather data is generated based on geography dataset from previouse process. Wea
 A time instant is genrated by randomly picking an epoch milliseconds between system current time and 10 years ago from current time. Time offset is roughly calculated by longitude with the formula `longtitude/15`. I apply the calculated time offset to the instant to get local date time.
 
 #### Temperature
-Temperature is impacted by the following factors:
+Assume temperature is impacted by the following factors:
 1. Latitude. The closer a position is to Equator, the greater is the temperature. I use a cosine wave to do the calculation and assume the variation is between 30 and -30 Centigrade. The formula is `30*cosin(2*latitude)`.
 2. Elevation. Temperatures in the troposphere drop an average of 6.5 Centigrade per kilometer of altitude (referencing [sciencing.com](https://sciencing.com/tutorial-calculate-altitude-temperature-8788701.html)). The formula is `-6.5*(elevation/1000)`
 3. Month. The closer a month to hot summer (July in the North Hemisphere or Jan in the South Hemisphere), the greater is the temperature. I use a sine wave to do the calculation and assume the variation is between + 15 and -15 Centigrade. The formula is `direction * sine(month*360/24 - 90) * 15`, where "deirction" is -1 or 1 representing the North Hemisphere or the South Hemisphere and "month" is an integer between 1 and 12.
