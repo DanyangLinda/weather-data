@@ -50,7 +50,7 @@ The earth image at [Visible Earth](https://visibleearth.nasa.gov/view.php?id=739
 3,6391,13
 ```
 
-Each line consists of three numbers. The first and second numbers are the x and y coordinate of a pixel. The third number is the grey value of the pixel. As the resolution of the earth image is 21600 by 10800, the generated csv file contains 233,280,000 lines representing 21600*10800 pixels of the Earth image. 
+Each line consists of three numbers. The first and second numbers are the x and y coordinate of a pixel. The third number is the grey value of the pixel. As the resolution of the earth image is 21600 by 10800, the generated csv file contains 233,280,000 lines representing 21600*10800 pixels in the Earth image. 
 
 However the earth image deson't have location lables. So I employ another dataset from [Simple Maps](https://simplemaps.com/data/world-cities). The dataset (weather-data/input/worldcities.csv) I used is the free version with about 13000 entries of city name, latitude and longitude as follows:
 ```
