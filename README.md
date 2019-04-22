@@ -5,7 +5,7 @@
 3. Spark 2.3.2 (spark is embeded lib, so you don't need to install it)
 
 ## Getting started
-1. Download the project. Please take a look at the pre-generated data as exmaple
+1. Download the project. Please take a look at the [pre-generated data](https://github.com/DanyangLinda/weather-data/blob/master/data-example/part-00000) as exmaple
 ```
 git clone git clone https://github.com/DanyangLinda/weather-data.git
 ```
@@ -63,17 +63,20 @@ Note:
 Weather data is generated based on geography data set from previouse process. Weather data consists of 5 parts: local date time, conditions (snow, sunny or rain), temperature, pressure and humidity. 
 
 #### Local date time
-Time offset can be roughly 
+A time instant is genrated by randomly picking an epoch milliseconds between system current time and 10 years ago. Time offset is roughly calculated by longitude with the formula `longtitude/15`. Getting the local date time by applying the calculated time offset to the instant.
 
 #### Temperature
-
+Temperature is impaced by the following factors:
+1. Latitude. The closer a position is to Equator, the greater is the temperature. I use a cosine wave to do the calculation and assume the variation is between 30 and -30 Centigrade. The formula is `30*cosin(2*latitude)`.
+2. Elevation. Temperatures in the troposphere drop an average of 6.5 Centigrade per kilometer of altitude (referencing [sciencing.com](https://sciencing.com/tutorial-calculate-altitude-temperature-8788701.html)). The formula is `-6.5*(elevation/1000)`
+3. Month. The closer a month to hot summer (July in the North Hemisphere or Jan in the South Hemisphere), the greater is the temperature. I use a sine wave to do the calculation and assume the variation is between + 15 and -15 Centigrade. The formula is `direction * sine(month*360/24 - 90) * 15`, where "deirction" is -1 or 1 representing the North Hemisphere or the South Hemisphere and "month" is an integer between 1 and 12.
+4. Time. I assume normally, the hightest temperature is at noon(12:00) and lowest temperature is at midnight(24:00). I use a sine wave to mimic the variation between +5 and -5. The formular is `sine(hourOfDay*360/24) * 5`
 
 #### Condition
-
+I only need to consider three conditions: Sunny, Rain and Snow. To make it simple, I assume that if temperature is below zero, the condition is randomly chosen between Sunny and Snow; if temperature is above zero, the condition is randomly chosen between Rain and Sunny. 
 
 #### Pressure
-
+Pressure is impacted by elevation. I adopt [Barometric formula](https://en.wikipedia.org/wiki/Barometric_formula) to calculate pressure.
 
 #### Humidity
-
-
+I assume condition has impact on Humidity. Humidity uniformly varies between 0 and 40 when snow, 30 and 100 when rain, 0 and 100 when sunny. 
