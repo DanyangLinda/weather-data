@@ -2,7 +2,8 @@
 ## Environment
 1. Scala 2.11.12
 2. Sbt 1.2.8
-3. Spark 2.3.2 (spark is embeded lib, so you don't need to install it)
+3. Java 8
+4. Spark 2.3.2 (spark is embeded lib, so you don't need to install it)
 
 ## Getting started
 1. Download the project. Please take a look at the [pre-generated data](https://github.com/DanyangLinda/weather-data/blob/master/data-example/part-00000) as exmaple
