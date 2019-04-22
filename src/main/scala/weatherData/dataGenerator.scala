@@ -37,6 +37,7 @@ object dataGenerator {
   def main(args: Array[String]): Unit = {
     //check if earth image csv file exists
     if(!File(imageData.earthImageCsv).exists) {
+      println("Start to generate earthImage.csv ......")
       imageData.convertEarthImageToCsv()
     }
 

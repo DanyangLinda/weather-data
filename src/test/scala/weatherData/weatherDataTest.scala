@@ -34,13 +34,13 @@ class weatherDataTest extends FunSuite {
     assert(temperature<=55 && temperature >= -55)
   }
 
-  test("generateCondition shouldn't emmit Rain when temperature is below zero") {
+  test("generateCondition shouldn't emit Rain when temperature is below zero") {
     val temperature: Double = -23
     val condition = weatherData.generateCondition(temperature)
     assert(!condition.equals(weatherData.rain) && weatherData.conditionsBelowZero.contains(condition))
   }
 
-  test("generateCondition shouldn't emmit Snow when temperature is above zero") {
+  test("generateCondition shouldn't emit Snow when temperature is above zero") {
     val temperature: Double = 23
     val condition = weatherData.generateCondition(temperature)
     assert(weatherData.conditionsAboveZero.contains(condition))
