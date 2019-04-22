@@ -29,7 +29,7 @@ Adelaide|-34.92,138.62,48|2016-01-03T12:35:37Z|Sunny|+39.4|1114.1|12
 As a candidate for Data Engineer - Big Data and Software Engineering, I would like to use this case to show my skill of using Spark and Scala to manipulate big dataset. 
 
 ### Construct geography dataset
-The earth image at [Visible Earth](https://visibleearth.nasa.gov/view.php?id=73934) contains elevation information of all positions on Earth. To make the image data can be easily fed in to Spark, the code will convert it into earthImage.csv as follows
+The earth image at [Visible Earth](https://visibleearth.nasa.gov/view.php?id=73934) contains elevation information of all positions on Earth. To make the image data can be easily fed in to Spark, the code will convert it into earthImage.csv first as follows
 ```
 3,6386,13
 3,6387,38
