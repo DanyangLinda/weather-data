@@ -5,16 +5,27 @@
 3. Spark 2.3.2 (spark is embeded lib, so you don't need to install it)
 
 ## Getting started
-1. Download the project. Please take a look at the pre-generated data as exmaple
+1. Download the project. Please take a look at the [pre-generated data](https://github.com/DanyangLinda/weather-data/blob/master/data-example/part-00000) as exmaple
 ```
-git clone git clone https://github.com/DanyangLinda/weather-data.git
+git clone https://github.com/DanyangLinda/weather-data.git
 ```
-2. Run the code. The output data is written in "weather-data/data-<timestamp>/part-00000".
+2. Run the code. The output data is written in "weather-data/data-\<timestamp>\/part-00000". It will generate weather data from about 13000 positions.
 ```
 cd weather-data
 sbt run
 ```
 3. Spark is configured to run in local mode with 1 core and 500 MB memory. It will take about 10 mininutes to finish for your first time to run the code, as it will take a few mininutes to convert the earth image to earthImage.csv of 3.2 GB.
+
+4. If you see the fowllowing worning message from Spark, please ignore it. It's not an error. It means Spark is cleaning up some temp files.  
+```
+19/04/22 13:22:45 WARN FileSystem: exception in the cleaner thread but it will continue to run
+java.lang.InterruptedException
+        at java.lang.Object.wait(Native Method)
+        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:144)
+        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:165)
+        at org.apache.hadoop.fs.FileSystem$Statistics$StatisticsDataReferenceCleaner.run(FileSystem.java:2989)
+        at java.lang.Thread.run(Thread.java:748)
+```
   
 ## Task
 The requirement is to genrate weather data from reasonable number of positions in the following format
@@ -29,7 +40,7 @@ Adelaide|-34.92,138.62,48|2016-01-03T12:35:37Z|Sunny|+39.4|1114.1|12
 As a candidate for Data Engineer - Big Data and Software Engineering, I would like to use this case to show my skill of using Spark and Scala to manipulate big dataset. 
 
 ### Construct geography dataset
-The earth image at [Visible Earth](https://visibleearth.nasa.gov/view.php?id=73934) contains elevation information of all positions on Earth. To make the image data can be easily fed in to Spark, the code will convert it into earthImage.csv as follows
+The earth image at [Visible Earth](https://visibleearth.nasa.gov/view.php?id=73934) contains elevation information of all positions on Earth. To make the image data can be easily fed in to Spark, the code will convert it into earthImage.csv first as follows
 ```
 3,6386,13
 3,6387,38
@@ -55,25 +66,26 @@ Using [Equirectangular Projection](https://www.tandfonline.com/doi/pdf/10.1080/1
 Location,Position(latitude, longitude, elevation)
 ```
 
-Note: 
-2. elevation = grayValue*(8848/255)
-1. In the implemenation, I don't use "join" function to combine the two datasets directly cause that will result in shuffling more than 3 GB data. As world cities dataset (about 1 MB) is much smaller than earth image dataset (about 3 GB), I decided to broadcast the samll dataset to avoid shuffle. 
+***Note: In the implemenation, I don't use "join" function to combine the two datasets directly cause that will result in shuffling more than 3 GB data. As world cities dataset (about 1 MB) is much smaller than earth image dataset (about 3 GB), I decided to broadcast the samll dataset to do [map-side join](https://jaceklaskowski.gitbooks.io/mastering-spark-sql/spark-sql-joins-broadcast.html) to avoid shuffle.***
 
 ### Generate weather data
-Weather data is generated based on geography data set from previouse process. Weather data consists of 5 parts: local date time, conditions (snow, sunny or rain), temperature, pressure and humidity. 
+Weather data is generated based on geography dataset from previouse process. Weather data consists of 5 parts: local date time, conditions (snow, sunny or rain), temperature, pressure and humidity. 
 
 #### Local date time
-Time offset can be roughly 
+A time instant is genrated by randomly picking an epoch milliseconds between system current time and 10 years ago. Time offset is roughly calculated by longitude with the formula `longtitude/15`. Getting the local date time by applying the calculated time offset to the instant.
 
 #### Temperature
-
+Temperature is impaced by the following factors:
+1. Latitude. The closer a position is to Equator, the greater is the temperature. I use a cosine wave to do the calculation and assume the variation is between 30 and -30 Centigrade. The formula is `30*cosin(2*latitude)`.
+2. Elevation. Temperatures in the troposphere drop an average of 6.5 Centigrade per kilometer of altitude (referencing [sciencing.com](https://sciencing.com/tutorial-calculate-altitude-temperature-8788701.html)). The formula is `-6.5*(elevation/1000)`
+3. Month. The closer a month to hot summer (July in the North Hemisphere or Jan in the South Hemisphere), the greater is the temperature. I use a sine wave to do the calculation and assume the variation is between + 15 and -15 Centigrade. The formula is `direction * sine(month*360/24 - 90) * 15`, where "deirction" is -1 or 1 representing the North Hemisphere or the South Hemisphere and "month" is an integer between 1 and 12.
+4. Time. I assume normally, the hightest temperature is at noon(12:00) and lowest temperature is at midnight(24:00). I use a sine wave to mimic the variation between +5 and -5. The formular is `sine(hourOfDay*360/24) * 5`
 
 #### Condition
-
+I only need to consider three conditions: Sunny, Rain and Snow. To make it simple, I assume that if temperature is below zero, the condition is randomly chosen between Sunny and Snow; if temperature is above zero, the condition is randomly chosen between Rain and Sunny. 
 
 #### Pressure
-
+Pressure is impacted by elevation. I adopt [Barometric formula](https://en.wikipedia.org/wiki/Barometric_formula) to calculate pressure.
 
 #### Humidity
-
-
+I assume condition has impact on Humidity. Humidity uniformly varies between 0 and 40 when snow, 30 and 100 when rain, 0 and 100 when sunny. 
