@@ -60,7 +60,7 @@ Note:
 1. In the implemenation, I don't use "join" function to combine the two datasets directly cause that will result in shuffling more than 3 GB data. As world cities dataset (about 1 MB) is much smaller than earth image dataset (about 3 GB), I decided to broadcast the samll dataset to avoid shuffle. 
 
 ### Generate weather data
-Weather data is generated based on geography data set from previouse process. Weather data consists of 5 parts: local date time, conditions (snow, sunny or rain), temperature, pressure and humidity. 
+Weather data is generated based on geography dataset from previouse process. Weather data consists of 5 parts: local date time, conditions (snow, sunny or rain), temperature, pressure and humidity. 
 
 #### Local date time
 A time instant is genrated by randomly picking an epoch milliseconds between system current time and 10 years ago. Time offset is roughly calculated by longitude with the formula `longtitude/15`. Getting the local date time by applying the calculated time offset to the instant.
